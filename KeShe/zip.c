@@ -10,6 +10,6 @@
 
 void CompressFile(char *filename) {
     //统计文件FileName各个字符出现的频率
-    int times[256];
+    int times[256] = {0};
     FileCharCount(filename, times);
 }

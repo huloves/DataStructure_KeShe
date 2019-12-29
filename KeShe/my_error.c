@@ -6,6 +6,6 @@
 #include <unistd.h>
 
 void my_error(char *type, int line) {
-    printf("line : %d %s\n", line, type);
+    printf("file\nline: %d\n", line);
     perror(type);
 }

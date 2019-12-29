@@ -13,4 +13,19 @@ void FileCharCount(char *filename, int *times) {
     if(fd == -1) {
         my_error("open", __LINE__-2);
     }
+    char buf[2];
+    int ret = read(fd, buf, 1);
+    if(ret == -1) {
+        my_error("read", __LINE__-2);
+    }
+    unsigned char ch;
+    while(ret != 0) {
+        ch = buf[0];
+        times[ch]++;
+        ret = read(fd, buf, 1);
+        if(ret == -1) {
+            my_error("read", __LINE__-2);
+        }
+    }
+    close(fd);
 }
