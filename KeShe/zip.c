@@ -14,18 +14,10 @@ void CompressFile(char *filename) {
     int times[256] = {0};
     FileCharCount(filename, times);
     //建立哈弗曼树
-    int char_number = 0;
+    const int char_number = 256;
     hu_tree_node *huffman_tree;
-    weight *w;
     huffman_code code;
-    for(int i=0; i<256; i++) {
-        if(times[i] != 0) {
-            char_number++;
-        }
-    }
     huffman_tree = (hu_tree_node*)malloc(sizeof(hu_tree_node)*(2*char_number-1));
-    w = (weight*)malloc(sizeof(weight)*char_number);
     (*code) = (char*)malloc(sizeof(char)*char_number);
-    CreateWeight(w, times);
-    CreateHuffmanTree(huffman_tree, w, char_number);
+    CreateHuffmanTree_Hash(huffman_tree, times, char_number);
 }

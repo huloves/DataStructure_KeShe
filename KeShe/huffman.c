@@ -20,19 +20,81 @@ void InitHuffmanTree(huffman_tree ht, weight *w, int n) {
     int m = 2*n-1;
     int i;
     for(i=0; i<n; i++) {
-        ht[i].wegiht = w[i].weight;
+        ht[i].weight = w[i].weight;
         ht[i].parent = 0;
         ht[i].lchild = 0;
         ht[i].rchild = 0;
     }
     for(i=n; i<m; i++) {
-        ht[i].wegiht = 0;
+        ht[i].weight = 0;
         ht[i].parent = 0;
         ht[i].lchild = 0;
         ht[i].rchild = 0;
     }
 }
 
+void InitHuffmanTree_Hash(huffman_tree ht, int *times, int char_number) {
+    int m = 2*char_number-1;
+    int i;
+    for(i=0; i<char_number; i++) {
+        ht[i].weight = times[i];
+        ht[i].parent = 0;
+        ht[i].lchild = 0;
+        ht[i].rchild = 0;
+    }
+    for(i=char_number; i<m; i++) {
+        ht[i].weight = 0;
+        ht[i].parent = 0;
+        ht[i].lchild = 0;
+        ht[i].rchild = 0;
+    }
+
+}
+
 void CreateHuffmanTree(huffman_tree ht, weight *w, int n) {
     InitHuffmanTree(ht, w, n);
+}
+
+void CreateHuffmanTree_Hash(huffman_tree ht, int *times, int char_number) {
+    InitHuffmanTree_Hash(ht, times, char_number);
+    int m = 2*char_number-1;
+    int s1, s2;
+    for(int i = char_number; i<m; i++) {
+        select_first(ht, i, &s1, &s2);
+        ht[i].weight = ht[s1].weight+ht[s2].weight;
+        ht[i].lchild = s1;
+        ht[i].rchild = s2;
+        ht[s1].parent = i;
+        ht[s2].parent = i;
+        //printf("%d %d-------%d %d\n", s1, s2, ht[s1].parent, ht[s2].parent);
+    }
+}
+
+void select_first(huffman_tree ht, int n, int *s1, int *s2) {
+    *s1 = 0;
+    *s2 = 0;
+
+    int min = 1000;
+    for(int i=0; i<n; i++) {
+        //printf("parent = %d | weight = %d\n", ht[i].parent, ht[i].weight);
+        if(ht[i].parent == 0){
+            if(ht[i].weight < min) {
+                min = ht[i].weight;
+                *s1 = i;
+            }
+        }
+    }
+    min = 1000;
+    for(int i=0; i<n; i++) {
+        if(i == *s1) {
+            continue;
+        }
+        if(ht[i].parent == 0){
+            if(ht[i].weight < min) {
+                min = ht[i].weight;
+                *s2 = i;
+            }
+        }
+    }
+    //printf("s1 = %d | s2 = %d\n", *s1, *s2);
 }
