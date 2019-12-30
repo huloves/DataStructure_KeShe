@@ -6,9 +6,11 @@
 #include <fcntl.h>
 #include <unistd.h>
 
+#include "huffman.h"
 #include "my_error.h"
 
 #define FILENAME_SIZE 256
+#define BUFFER_SIZE 1024
 
 void FileCharCount(char *filename, int *times) {
     int fd = open(filename, O_RDONLY);
@@ -32,11 +34,11 @@ void FileCharCount(char *filename, int *times) {
     close(fd);
 }
 
-void TouchZipFile(char *filename) {
+void TouchZipFile(char *filename, char *tarfilename) {
+    printf("C\n");
     //创建目标文件
     int fd;
-    char buf[1024];
-    char tarfilename[FILENAME_SIZE];
+    char buf[BUFFER_SIZE];
     for(int i=0; filename[i]!='.'; i++) {
         buf[i] = filename[i];
     }
@@ -55,4 +57,49 @@ void TouchZipFile(char *filename) {
         my_error("write", __LINE__-2);
         exit(1);
     }
+    close(fd);
+}
+
+void SourceToCode(char *sourcefile, char *targetfile, huffman_code hc) {
+    int fd_target;
+    int fd_source;
+    char buf_read[BUFFER_SIZE];
+    char buf_write[BUFFER_SIZE];
+    fd_source = open(sourcefile, O_RDONLY);
+    if(fd_source == -1) {
+        my_error("open", __LINE__-2);
+    }
+    fd_target = open(targetfile, O_WRONLY);
+    if(fd_target == -1) {
+        my_error("open", __LINE__-2);
+    }
+    if(lseek(fd_target, 0, SEEK_END) == -1) {
+        my_error("lseek", __LINE__-1);
+    }
+
+    
+    int ret = read(fd_source, buf_read, 1);
+    if(ret == -1) {
+        my_error("read", __LINE__-2);
+    }
+    while(ret) {
+        unsigned char ch = buf_read[0];
+        strcpy(buf_write, hc[ch]);
+        /*if(lseek(fd_target, 0, SEEK_END) == -1) {
+            my_error("lseek", __LINE__-1);
+        }*/
+        int ret_w = write(fd_target, buf_write, strlen(buf_write));
+        if(ret_w == -1) {
+            my_error("write", __LINE__-2);
+            exit(1);
+        }
+        ret = read(fd_source, buf_read, 1);
+        if(ret == -1) {
+            my_error("read", __LINE__-2);
+            exit(1);
+        }
+    }
+    
+    close(fd_source);
+    close(fd_target);
 }

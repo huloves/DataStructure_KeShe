@@ -11,7 +11,7 @@ typedef struct weight {
     int weight;
 }weight;
 
-typedef char **huffman_code;
+typedef char *huffman_code[256];
 
 void CreateWeight(weight *w, int *times);
 void InitHuffmanTree(huffman_tree ht, weight *w, int n);

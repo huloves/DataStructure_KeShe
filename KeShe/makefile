@@ -1,7 +1,7 @@
 objects = hfm_tar.o zip.o huffman.o file_operation.o my_error.o
 cc = gcc
 _tar : $(objects)
-	cc -o _tar $(objects)
+	cc -o  _tar -g $(objects)
 
 hfm_tar.o : hfm_tar.c
 zip.o : zip.c zip.h
