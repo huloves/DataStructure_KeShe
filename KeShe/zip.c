@@ -8,6 +8,8 @@
 
 #include "file_operation.h"
 #include "huffman.h"
+#include "my_error.h"
+
 #define FILENAME_SIZE 256
 
 void CompressFile(char *filename) {
@@ -33,4 +35,18 @@ void CompressFile(char *filename) {
     TouchZipFile(filename, tarfilename, times);
     //源文件字符编码并写入目标文件
     SourceToCode(filename, tarfilename, code);
+}
+
+void UnZipFile(char *filename) {
+    //打开文件
+    int fd;
+    fd = open(filename, O_RDONLY);
+    if(fd == -1) {
+        my_error("open", __LINE__-2);
+        exit(1);
+    }
+    char buf[1024];
+    //读取文件名
+    MyGetLine(fd, buf);
+    printf("uncodeFile:%s\n", buf);
 }

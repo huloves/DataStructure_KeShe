@@ -7,7 +7,7 @@
 
 int main(int argc, char *argv[])
 {
-    if(argc < 3) {
+    if(argc != 3) {
         printf("./MingLing [-option] FileName\n");
         printf("-option: -c, -u\n");
         printf("-c: 压缩文件\n");
@@ -19,6 +19,8 @@ int main(int argc, char *argv[])
     switch(option) {
     case 'c':
         CompressFile(argv[2]);
+    case 'u':
+        UnZipFile(argv[2]);
     }
 
     return 0;

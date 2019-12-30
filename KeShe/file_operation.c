@@ -120,3 +120,30 @@ void SourceToCode(char *sourcefile, char *targetfile, huffman_code hc) {
     close(fd_source);
     close(fd_target);
 }
+
+int MyGetLine(int fd, char *buf) {
+    char buf_char[1];
+    int read_size = 0;
+    
+    int ret = read(fd, buf_char, 1);
+    if(ret == -1) {
+        my_error("read", __LINE__-2);
+        exit(1);
+    }
+    if(ret == 0) {
+        return -1;
+    }
+    strcpy(buf, buf_char);
+    while(buf[read_size] != '\n') {
+        read_size++;
+        ret = read(fd, buf_char, 1);
+        if(ret == -1) {
+            my_error("read", __LINE__-2);
+            return -1;
+        }
+        strcat(buf, buf_char);
+    }
+    int len = strlen(buf);
+    buf[len-1] = '\0';
+    return read_size;
+}
