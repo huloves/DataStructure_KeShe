@@ -98,3 +98,26 @@ void select_first(huffman_tree ht, int n, int *s1, int *s2) {
     }
     //printf("s1 = %d | s2 = %d\n", *s1, *s2);
 }
+
+void CreateHuffmanCode_Hash(huffman_tree ht, huffman_code hc, int char_number) {
+    char *cd;
+    int start;
+    cd = (char*)malloc(sizeof(char)*char_number);
+    cd[char_number-1] = '\0';
+    for(int i=0; i<char_number; i++) {
+        start = char_number-1;
+        int c = i;
+        int p = ht[i].parent;
+        while(p != 0) {
+            start--;
+            if(ht[p].lchild == c) cd[start] = '0';
+            else cd[start] = '1';
+            c = p;
+            p = ht[p].parent;
+        }
+        hc[i] = (char*)malloc(sizeof(char)*(char_number-start));
+        strcpy(hc[i], &cd[start]);
+    }
+    free(cd);
+
+}

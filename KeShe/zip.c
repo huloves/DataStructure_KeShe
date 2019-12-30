@@ -20,4 +20,9 @@ void CompressFile(char *filename) {
     huffman_tree = (hu_tree_node*)malloc(sizeof(hu_tree_node)*(2*char_number-1));
     (*code) = (char*)malloc(sizeof(char)*char_number);
     CreateHuffmanTree_Hash(huffman_tree, times, char_number);
+    //建立哈弗曼编码
+    CreateHuffmanCode_Hash(huffman_tree, code, char_number);
+    /*for(int i=0; i<char_number; i++) {
+        printf("%d---------------%s\n", i, code[i]);
+    }*/
 }

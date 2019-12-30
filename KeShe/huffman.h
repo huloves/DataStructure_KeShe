@@ -18,6 +18,7 @@ void InitHuffmanTree(huffman_tree ht, weight *w, int n);
 void InitHuffmanTree_Hash(huffman_tree ht, int *times, int char_number);
 void CreateHuffmanTree(huffman_tree ht, weight *w, int n);
 void CreateHuffmanTree_Hash(huffman_tree ht, int *times, int char_number);
+void CreateHuffmanCode_Hash(huffman_tree ht, huffman_code hc, int char_number);
 
 void select_first(huffman_tree ht, int n, int *s1, int *s2);
 
