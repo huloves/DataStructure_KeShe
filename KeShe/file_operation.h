@@ -9,5 +9,7 @@ void TouchZipFile(char *filename, char *tarfilename, int *times);
 void TouchUnZipFile(char *filename, char *untarfilename);
 void SourceToCode(char *sourcefile, char *targetfile, huffman_code hc);
 void GetTimes(char *filename, int *times);
+int GetSourceSize(char *filename);
+int GetBit(int sourcefd);
 
 #endif

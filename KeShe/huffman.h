@@ -20,5 +20,6 @@ void CreateHuffmanTree(huffman_tree ht, weight *w, int n);
 void CreateHuffmanTree_Hash(huffman_tree ht, int *times, int char_number);
 void CreateHuffmanCode_Hash(huffman_tree ht, huffman_code hc, int char_number);
 void select_first(huffman_tree ht, int n, int *s1, int *s2);
+void Translation(huffman_tree ht, int *times, int char_number, char *source_file, char *target_file, int source_size);
 
 #endif

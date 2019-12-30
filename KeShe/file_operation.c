@@ -176,12 +176,12 @@ void GetTimes(char *filename, int *times) {
     //读取两行，文件指针指向第行
     MyGetLine(fd, buf);
     MyGetLine(fd, buf);
+    int source_size = atoi(buf);
     char read_buf[1];
     if(read(fd, read_buf, 1) == -1) {
         my_error("read", __LINE__-1);
         exit(1);
     }
-    //printf("%c\n", read_buf[0]);
     int i=0;
     while(read_buf[0] != '\n') {
         int k=0;
@@ -203,9 +203,34 @@ void GetTimes(char *filename, int *times) {
         times[i++] = temp;
     }
     close(fd);
-    /*for(int i=0; i<256; i++) {
-        printf("%d-----------%d\n", i, times[i]);
-    }*/
-
 }
 
+int GetSourceSize(char *filename) {
+    int fd = open(filename, O_RDONLY);
+    if(fd == -1) {
+        my_error("open", __LINE__-2);
+        exit(1);
+    }
+    char buf[1024];
+    MyGetLine(fd, buf);
+    MyGetLine(fd, buf);
+    int size = atoi(buf);
+    close(fd);
+    printf("buf:%s\n", buf);
+    return size;
+}
+
+int GetBit(int sourcefd) {
+    static int i=7;
+    static unsigned char Bchar;
+    int x;
+    unsigned char bit[8] = {128, 64, 32, 16, 8, 4, 2, 1};
+    i++;
+    char buf[1];
+    if(i == 8) {
+        read(sourcefd, buf, 1);
+        Bchar = buf[0];
+        i = 0;
+    }
+    return (Bchar&bit[i]);
+}

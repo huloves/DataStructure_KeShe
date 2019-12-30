@@ -19,8 +19,13 @@ int main(int argc, char *argv[])
     switch(option) {
     case 'c':
         CompressFile(argv[2]);
+        break;
     case 'u':
         UnZipFile(argv[2]);
+        break;
+    default:
+        printf("选项错误\n");
+        break;
     }
 
     return 0;

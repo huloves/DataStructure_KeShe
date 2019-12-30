@@ -123,4 +123,38 @@ void CreateHuffmanCode_Hash(huffman_tree ht, huffman_code hc, int char_number) {
     free(cd);
 }
 
-
+void Translation(huffman_tree ht, int *times, int char_number, char *source_file, char *target_file, int source_size) {
+    //打开压缩文件和目标文件
+    int source_fd, target_fd;
+    source_fd = open(source_file, O_RDONLY);
+    if(source_fd == -1) {
+        my_error("open", __LINE__-2);
+        exit(1);
+    }
+    target_fd = open(target_file, O_WRONLY);
+    if(target_fd == -1) {
+        my_error("open", __LINE__-2);
+        exit(1);
+    }
+    //压缩文件的文件指针指向第四行
+    char buf[1024];
+    for(int i=0; i<3; i++) {
+        MyGetLine(source_fd, buf);
+    }
+    int m = 2*char_number-1;
+    int x, c, j;
+    for(x=0; x<source_size; x++) {
+        j = m-1;
+        while(ht[j].lchild != 0 || ht[j].rchild != 0) {
+            if(GetBit(source_fd)) {
+                j = ht[j].rchild;
+            }
+            else {
+                j = ht[j].lchild;
+            }
+        }
+        buf[0] = times[j];
+        buf[1] = '\0';
+        write(target_fd, buf, 1);
+    }
+}
