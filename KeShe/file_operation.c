@@ -5,6 +5,8 @@
 #include <string.h>
 #include <fcntl.h>
 #include <unistd.h>
+#include <sys/stat.h>
+#include <math.h>
 
 #include "huffman.h"
 #include "my_error.h"
@@ -29,16 +31,18 @@ void FileCharCount(char *filename, int *times) {
         ret = read(fd, buf, 1);
         if(ret == -1) {
             my_error("read", __LINE__-2);
+            exit(1);
         }
     }
     close(fd);
 }
 
-void TouchZipFile(char *filename, char *tarfilename) {
-    printf("C\n");
+void TouchZipFile(char *filename, char *tarfilename, int *times) {
     //创建目标文件
     int fd;
     char buf[BUFFER_SIZE];
+    struct stat stat_struct;
+    stat(filename, &stat_struct); //获得文件属性
     for(int i=0; filename[i]!='.'; i++) {
         buf[i] = filename[i];
     }
@@ -50,11 +54,23 @@ void TouchZipFile(char *filename, char *tarfilename) {
         exit(1);
     }
     //在目标文件中写入源文件信息
-    sprintf(buf, "%s\n", filename);
+    sprintf(buf, "%s\n%ld\n", filename, stat_struct.st_size);
     printf("buf:%s", buf);
     int ret = write(fd, buf, strlen(buf));
     if(ret == -1) {
         my_error("write", __LINE__-2);
+        exit(1);
+    }
+    for(int i=0; i<256; i++) {
+        sprintf(buf, "%d ", times[i]);
+        if(write(fd, buf, strlen(buf)) == -1) {
+            my_error("write", __LINE__-1);
+            exit(1);
+        }
+    }
+    sprintf(buf, "\n");
+    if(write(fd, buf, strlen(buf)) == -1) {
+        my_error("write", __LINE__-1);
         exit(1);
     }
     close(fd);
@@ -77,29 +93,30 @@ void SourceToCode(char *sourcefile, char *targetfile, huffman_code hc) {
         my_error("lseek", __LINE__-1);
     }
 
-    
     int ret = read(fd_source, buf_read, 1);
     if(ret == -1) {
         my_error("read", __LINE__-2);
     }
-    while(ret) {
+    unsigned char bit[8] = {128, 64, 32, 16, 8, 4, 2, 1};
+    while(ret != 0) {
         unsigned char ch = buf_read[0];
-        strcpy(buf_write, hc[ch]);
-        /*if(lseek(fd_target, 0, SEEK_END) == -1) {
-            my_error("lseek", __LINE__-1);
-        }*/
-        int ret_w = write(fd_target, buf_write, strlen(buf_write));
-        if(ret_w == -1) {
-            my_error("write", __LINE__-2);
-            exit(1);
+        unsigned char wb = 0;
+        int len = strlen(hc[ch]);
+        for(int i=0; i<len; i++) {
+            if(hc[ch][i] != 0) {
+                wb &= bit[i];
+            }
+        }
+        buf_write[0] = wb;
+        if(write(fd_target, buf_write, 1) == -1) {
+            my_error("write", __LINE__-1);
         }
         ret = read(fd_source, buf_read, 1);
         if(ret == -1) {
             my_error("read", __LINE__-2);
-            exit(1);
         }
     }
-    
+
     close(fd_source);
     close(fd_target);
 }

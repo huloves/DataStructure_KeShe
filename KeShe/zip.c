@@ -30,7 +30,7 @@ void CompressFile(char *filename) {
     char *tarfilename;
     tarfilename = (char*)malloc(sizeof(char)*(strlen(filename)+256));
     //printf("a\n");
-    TouchZipFile(filename, tarfilename);
+    TouchZipFile(filename, tarfilename, times);
     //源文件字符编码并写入目标文件
     SourceToCode(filename, tarfilename, code);
 }
