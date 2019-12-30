@@ -76,6 +76,23 @@ void TouchZipFile(char *filename, char *tarfilename, int *times) {
     close(fd);
 }
 
+void TouchUnZipFile(char *filename, char *untarfilename) {
+    //创建目标文件
+    int fd;
+    char buf[BUFFER_SIZE];
+    for(int i=0; filename[i]!='.'; i++) {
+        buf[i] = filename[i];
+    }
+    sprintf(untarfilename, "%s.uncode", buf);
+    printf("tarfilename:%s\n", untarfilename);
+    fd = open(untarfilename, O_WRONLY | O_CREAT, 0777);
+    if(fd == -1) {
+        my_error("open", __LINE__-2);
+        exit(1);
+    }
+    close(fd);
+}
+
 void SourceToCode(char *sourcefile, char *targetfile, huffman_code hc) {
     int fd_target;
     int fd_source;
@@ -147,3 +164,48 @@ int MyGetLine(int fd, char *buf) {
     buf[len-1] = '\0';
     return read_size;
 }
+
+void GetTimes(char *filename, int *times) {
+    int fd;
+    fd = open(filename, O_RDONLY);
+    if(fd == -1) {
+        my_error("open", __LINE__-2);
+        exit(1);
+    }
+    char buf[1024];
+    //读取两行，文件指针指向第行
+    MyGetLine(fd, buf);
+    MyGetLine(fd, buf);
+    char read_buf[1];
+    if(read(fd, read_buf, 1) == -1) {
+        my_error("read", __LINE__-1);
+        exit(1);
+    }
+    //printf("%c\n", read_buf[0]);
+    int i=0;
+    while(read_buf[0] != '\n') {
+        int k=0;
+        while(read_buf[0] != ' ' && read_buf[0] != '\n') {
+            buf[k++] = read_buf[0];
+            if(read(fd, read_buf, 1) == -1) {
+                my_error("read", __LINE__-1);
+                exit(1);
+            }
+        }
+        if(read_buf[0] == ' ') {
+            if(read(fd, read_buf, 1) == -1) {
+                my_error("read", __LINE__-1);
+                exit(1);
+            }
+        }
+        buf[k] = '\0';
+        int temp = atoi(buf);
+        times[i++] = temp;
+    }
+    close(fd);
+    /*for(int i=0; i<256; i++) {
+        printf("%d-----------%d\n", i, times[i]);
+    }*/
+
+}
+

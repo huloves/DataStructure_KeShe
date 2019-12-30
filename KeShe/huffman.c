@@ -4,7 +4,9 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#include <fcntl.h>
 
+#include "file_operation.h"
 #include "my_error.h"
 
 void CreateWeight(weight *w, int *times) {
@@ -120,3 +122,5 @@ void CreateHuffmanCode_Hash(huffman_tree ht, huffman_code hc, int char_number) {
     }
     free(cd);
 }
+
+

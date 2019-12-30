@@ -38,15 +38,14 @@ void CompressFile(char *filename) {
 }
 
 void UnZipFile(char *filename) {
-    //打开文件
-    int fd;
-    fd = open(filename, O_RDONLY);
-    if(fd == -1) {
-        my_error("open", __LINE__-2);
-        exit(1);
-    }
-    char buf[1024];
-    //读取文件名
-    MyGetLine(fd, buf);
-    printf("uncodeFile:%s\n", buf);
+    //创建目标文件
+    char *untarfilename;
+    untarfilename = (char*)malloc(sizeof(char)*(strlen(filename)+256));
+    //TouchUnZipFile(filename, untarfilename);
+    //建立哈弗曼树
+    int times[256] = {0};
+    const int char_number = 256;
+    hu_tree_node *huffman_tree;
+    //获取times
+    GetTimes(filename, times);
 }
