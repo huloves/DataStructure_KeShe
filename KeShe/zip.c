@@ -25,4 +25,6 @@ void CompressFile(char *filename) {
     /*for(int i=0; i<char_number; i++) {
         printf("%d---------------%s\n", i, code[i]);
     }*/
+    //创建压缩文件，写入压缩文件的头部
+    TouchZipFile(filename);
 }

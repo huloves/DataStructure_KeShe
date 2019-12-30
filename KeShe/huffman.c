@@ -119,5 +119,4 @@ void CreateHuffmanCode_Hash(huffman_tree ht, huffman_code hc, int char_number) {
         strcpy(hc[i], &cd[start]);
     }
     free(cd);
-
 }
