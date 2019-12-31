@@ -96,8 +96,8 @@ void TouchUnZipFile(char *filename, char *untarfilename) {
 void SourceToCode(char *sourcefile, char *targetfile, huffman_code hc) {
     int fd_target;
     int fd_source;
-    char buf_read[BUFFER_SIZE];
-    char buf_write[BUFFER_SIZE];
+    unsigned char buf_read[1];
+    unsigned char buf_write[1];
     fd_source = open(sourcefile, O_RDONLY);
     if(fd_source == -1) {
         my_error("open", __LINE__-2);
@@ -115,15 +115,36 @@ void SourceToCode(char *sourcefile, char *targetfile, huffman_code hc) {
         my_error("read", __LINE__-2);
     }
     unsigned char bit[8] = {128, 64, 32, 16, 8, 4, 2, 1};
+    char buf_overflow[8];
     while(ret != 0) {
         unsigned char ch = buf_read[0];
+        //构建8位的wb，用于以位为单位写入文件
         unsigned char wb = 0;
-        int len = strlen(hc[ch]);
-        for(int i=0; i<len; i++) {
-            if(hc[ch][i] != 0) {
-                wb &= bit[i];
+        int i=0;
+        while(i<8) {
+            int len = strlen(hc[ch]);
+            int j;
+            for(j=0; j<len && i+j<8; j++) {
+                if(hc[ch][j] != 0) {
+                    wb &= bit[i+j];
+                }
+                ret = read(fd_source, buf_read, 1);
             }
+            i += j;
+            int tmp=0;
+            int k;
+            for(k=j; k<len; k++) {
+                buf_overflow[tmp++] = hc[ch][k];
+            }
+            buf_overflow[k] = '\0';
+            ret = read(fd_source, buf_read, 1);
+            if(ret == -1) {
+                my_error("read", __LINE__-2);
+                exit(1);
+            }
+            ch = buf_read[0];
         }
+        //将构建的wb写入文件
         buf_write[0] = wb;
         if(write(fd_target, buf_write, 1) == -1) {
             my_error("write", __LINE__-1);

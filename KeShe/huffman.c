@@ -141,6 +141,7 @@ void Translation(huffman_tree ht, int *times, int char_number, char *source_file
     for(int i=0; i<3; i++) {
         MyGetLine(source_fd, buf);
     }
+    //读取编码，进行译码
     int m = 2*char_number-1;
     int x, c, j;
     for(x=0; x<source_size; x++) {

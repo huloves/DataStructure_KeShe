@@ -19,7 +19,6 @@ void CompressFile(char *filename) {
     //建立哈弗曼树
     const int char_number = 256;
     hu_tree_node *huffman_tree;
-    //huffman_code code;
     huffman_tree = (hu_tree_node*)malloc(sizeof(hu_tree_node)*(2*char_number-1));
     CreateHuffmanTree_Hash(huffman_tree, times, char_number);
     //建立哈弗曼编码
@@ -51,5 +50,6 @@ void UnZipFile(char *filename) {
     hu_tree_node *huffman_tree;
     huffman_tree = (hu_tree_node*)malloc(sizeof(hu_tree_node)*(2*char_number-1));
     CreateHuffmanTree_Hash(huffman_tree, times, char_number);
+    //解压缩
     Translation(huffman_tree, times, char_number, filename, untarfilename, source_size);
 }
