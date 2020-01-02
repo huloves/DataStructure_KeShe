@@ -159,3 +159,69 @@ void Translation(huffman_tree ht, int *times, int char_number, char *source_file
         write(target_fd, buf, 1);
     }
 }
+
+void Translation_(huffman_tree ht, int *times, int char_number, char *source_file, char *target_file, int source_size) {
+    //打开压缩文件和目标文件
+    int source_fd, target_fd;
+    source_fd = open(source_file, O_RDONLY);
+    if(source_fd == -1) {
+        my_error("open", __LINE__-2);
+        exit(1);
+    }
+    target_fd = open(target_file, O_WRONLY);
+    if(target_fd == -1) {
+        my_error("open", __LINE__-2);
+        exit(1);
+    }
+    //压缩文件的文件指针指向第四行
+    char buf[1024];
+    for(int i=0; i<3; i++) {
+        MyGetLine(source_fd, buf);
+    }
+    //读取编码，进行译码
+    int m = 2*char_number-1;
+    int x, j;
+    for(x=0; x<source_size; x++) {
+        j = m-1;
+        while(ht[j].lchild != 0 || ht[j].rchild != 0) {
+            if(GetByte(source_fd) == '1') {
+                j = ht[j].rchild;
+            }
+            else {
+                j = ht[j].lchild;
+            }
+        }
+        buf[0] = j;
+        //printf("buf[0]:%d\n", buf[0]);
+        write(target_fd, buf, 1);
+    }
+}
+
+void PrintCode(huffman_code hc, int *times) {
+    for(int i=0; i<256; i++) {
+        if(times[i] != 0) {
+            printf("%c:%s\n", i, hc[i]);
+        }
+    }
+}
+
+void PrintHuffmanTree(huffman_tree ht) {
+    printf("number\t\tweight\t\t\tparent\t\t\tLchild\t\t\tRchild\n");
+    for(int i=0; i<2*256-1; i++) {
+        printf("%d\t%d\t\t%d\t\t%d\t\t%d\n", i, ht[i].weight, ht[i].parent, ht[i].lchild, ht[i].rchild);
+    }
+}
+
+void PrintTree_TreeShape(huffman_tree ht, int xiabiao, int level) {
+    if(ht[xiabiao].lchild == 0) {
+        for(int i=0; i<level; i++) {
+            printf("|");
+            printf("     ");
+        }
+        printf("|--- ");
+        printf("%d\n", xiabiao);
+        PrintTree_TreeShape(ht, ht[xiabiao].lchild, level+1);
+        PrintTree_TreeShape(ht, ht[xiabiao].rchild, level+1);
+    }
+}
+

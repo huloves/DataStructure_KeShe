@@ -10,8 +10,10 @@ int main(int argc, char *argv[])
     if(argc != 3) {
         printf("./MingLing [-option] FileName\n");
         printf("-option: -c, -u\n");
-        printf("-c: 压缩文件\n");
-        printf("-u: 解压文件\n");
+        printf("-c: 压缩\n");
+        printf("-u: 解压\n");
+        printf("-o: 编码\n");
+        printf("-d: 解码\n");
         exit(1);
     }
 
@@ -22,6 +24,12 @@ int main(int argc, char *argv[])
         break;
     case 'u':
         UnZipFile(argv[2]);
+        break;
+    case 'o':
+        CodingFile(argv[2]);
+        break;
+    case 'd':
+        DecodeFile(argv[2]);
         break;
     default:
         printf("选项错误\n");
