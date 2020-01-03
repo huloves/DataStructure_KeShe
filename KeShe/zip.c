@@ -81,7 +81,7 @@ void DecodeFile(char *filename) {
     //创建目标文件
     char *untarfilename;
     untarfilename = (char*)malloc(sizeof(char)*(strlen(filename)+256));
-    TouchUnZipFile(filename, untarfilename);
+    TouchDecodeFile(filename, untarfilename);
     printf("目标文件创建完成\n");
     //获取times和源文件大小
     int times[256] = {0};

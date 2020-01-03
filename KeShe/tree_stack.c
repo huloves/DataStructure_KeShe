@@ -87,8 +87,6 @@ void pop(stack *top, bitree *root)
 		printf("the stack is empty.\n");
 	}
 	
-    //printf("%c\n", (*top)->root->item.ch);
-
 	temp = *top;
 	*top = temp->next;
 	*root = temp->root;
@@ -251,3 +249,4 @@ void level_order(bitree *root)
         }
     }
 }
+

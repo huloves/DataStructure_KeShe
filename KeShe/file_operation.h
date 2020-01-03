@@ -8,6 +8,7 @@ void FileCharCount(char *fileName, int *times);
 void TouchZipFile(char *filename, char *tarfilename, int *times);
 void TouchUnZipFile(char *filename, char *untarfilename);
 void TouchCodingFile(char *filename, char *codingfilename, int *times);
+void TouchDecodeFile(char *filename, char *decodefliename);
 void SourceToCode(char *sourcefile, char *targetfile, huffman_code hc);
 void SourceToCode_(char *sourcefile, char *targetfile, huffman_code hc);
 void GetTimes(char *filename, int *times);

@@ -46,7 +46,7 @@ void TouchZipFile(char *filename, char *tarfilename, int *times) {
     for(int i=0; filename[i]!='.'; i++) {
         buf[i] = filename[i];
     }
-    sprintf(tarfilename, "%s.code", buf);
+    sprintf(tarfilename, "%s.zip", buf);
     printf("tarfilename:%s\n", tarfilename);
     fd = open(tarfilename, O_WRONLY | O_CREAT, 0777);
     if(fd == -1) {
@@ -85,7 +85,7 @@ void TouchCodingFile(char *filename, char *tarfilename, int *times) {
     for(int i=0; filename[i]!='.'; i++) {
         buf[i] = filename[i];
     }
-    sprintf(tarfilename, "%s.zip", buf);
+    sprintf(tarfilename, "%s.code", buf);
     printf("tarfilename:%s\n", tarfilename);
     fd = open(tarfilename, O_WRONLY | O_CREAT, 0777);
     if(fd == -1) {
@@ -133,11 +133,29 @@ void TouchUnZipFile(char *filename, char *untarfilename) {
     close(fd);
 }
 
+void TouchDecodeFile(char *filename, char *decodefliename) {
+    //创建目标文件
+    int fd;
+    char buf[BUFFER_SIZE];
+    for(int i=0; filename[i]!='.'; i++) {
+        buf[i] = filename[i];
+    }
+    sprintf(decodefliename, "%s.decode", buf);
+    printf("tarfilename:%s\n", decodefliename);
+    fd = open(decodefliename, O_WRONLY | O_CREAT, 0777);
+    if(fd == -1) {
+        my_error("open", __LINE__-2);
+        exit(1);
+    }
+    close(fd);
+}
+
 void SourceToCode(char *sourcefile, char *targetfile, huffman_code hc) {
+    unsigned char save = 0; //每次保存一个字节的长度
+    int len = 0; //每次保存的一个字节已经存了多少长度
     int fd_target;
     int fd_source;
-    unsigned char buf_read[1];
-    unsigned char buf_write[1];
+    char buf_read[1024];
     //打开源文件和目标文件
     fd_source = open(sourcefile, O_RDONLY);
     if(fd_source == -1) {
@@ -152,60 +170,76 @@ void SourceToCode(char *sourcefile, char *targetfile, huffman_code hc) {
     }
 
     //压缩
-    unsigned char bit[8] = {128, 64, 32, 16, 8, 4, 2, 1};
-    int ret = read(fd_source, buf_read, 1);
-    if(ret == -1) {
-        my_error("read", __LINE__-2);
-        exit(1);
-    }
-    unsigned char buf_over[8]; //存储上一次溢出的位
-    while(ret) {
-        unsigned char wb = 0;
-        //保存溢出的位
-        int over;
-        for(over=0; buf_over[over]; over++) {
-            if(buf_over[over] == 1) {
-                wb &= bit[over];
+    int ret;
+    while((ret = read(fd_source, buf_read, 1024)) && ret > 0) {
+        for(int i=0; i<ret; i++) {
+            if(buf_read[i] >= 0 && buf_read[i] < 126) {
+                int j=0; 
+                while(1) {
+                    if(buf_read[i] == j) {
+                        int hc_len = strlen(hc[j]);
+                        for(int k=0; k<hc_len; k++) {
+                            if(len != 0) save = save << 1;
+
+                            save = save | (hc[j][k]-'0');
+                            len++;
+                            //一个字节已存满,写入文件
+                            
+                            if(len == 8) {
+                                write(fd_target, &save, sizeof(save));
+                                save = 0;
+                                len = 0;
+                            }
+                        }
+                        break;
+                    }
+                    j++;
+                }
             }
-        }
-        over = 0;
-        //保存读出的位
-        int out = over; //wb的位
-        int in = 0; //buf_raed的位
-        unsigned char ch = buf_read[0];
-        while(out < 8) {
-            for(in=0; hc[ch][in]; in++) {
-                if(out == 8) {
+            else {
+                if((ret-i) >= 3) {
+                    char temp[3];
+                    memset(temp, 0, sizeof(temp));
+                    strncpy(temp, buf_read+i, 3);
+                    int j=0;
+                    while(1) {
+                        if(strncmp(temp, hc[j], 3) == 1) {
+                            int hc_len = strlen(hc[j]);
+                            for(int k=0; k<hc_len; k++) {
+                                //按位操作保存编码
+                                if(len != 0) save = save << 1;
+
+                                save = save | hc[j][k] - '0';
+                                len++;
+                                //一个字节已存满
+                                if(len == 8) {
+                                    write(fd_target, &save, sizeof(save));
+                                    save = 0;
+                                    len = 0;
+                                }
+                            }
+                            break;
+                        }
+                        j++;
+                    }
+                    i += 2;
+                }
+                else {
+                    lseek(fd_source, ret+i, SEEK_CUR);
                     break;
                 }
-                if(hc[ch][in] == 1) {
-                    wb &= bit[out+in];
-                    out++;
-                }
-            }
-            if(out < 8) {
-                ret = read(fd_source, buf_read, 1);
-                ch = buf_read[0];
             }
         }
-        //如果有溢出的话，保存溢出的位
-        while(hc[ch][in]) {
-            buf_over[over] = hc[ch][in];
-            over++;
-            in++;
-        }
-        //写入文件
-        buf_write[0] = wb;
-        if(write(fd_target, buf_write, 1) == -1) {
-            my_error("write", __LINE__-1);
-            exit(1);
-        }
+    }
+    if(len != 0) {
+        write(fd_target, &save, sizeof(save));
     }
     
     close(fd_source);
     close(fd_target);
 }
 
+//编码
 void SourceToCode_(char *sourcefile, char *targetfile, huffman_code hc) {
     //打开源文件和目标文件
     int fd_target;

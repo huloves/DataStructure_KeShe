@@ -9,7 +9,7 @@ int main(int argc, char *argv[])
 {
     if(argc != 3) {
         printf("./MingLing [-option] FileName\n");
-        printf("-option: -c, -u\n");
+        printf("-option: -c, -u, -o, -d\n");
         printf("-c: 压缩\n");
         printf("-u: 解压\n");
         printf("-o: 编码\n");

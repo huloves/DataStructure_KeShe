@@ -154,7 +154,7 @@ void Translation(huffman_tree ht, int *times, int char_number, char *source_file
                 j = ht[j].lchild;
             }
         }
-        buf[0] = times[j];
+        buf[0] = j;
         buf[1] = '\0';
         write(target_fd, buf, 1);
     }
